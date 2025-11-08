@@ -1,9 +1,0 @@
-battalions:
-  - id: "infantry"
-    name: "Infantry Battalion"
-    stats: { soft_attack: 5, hard_attack: 1, defense: 6, hp: 25, speed: 4 }
-    weight: 1
-  - id: "engineers"
-    name: "Engineer Company"
-    stats: { soft_attack: 1, defense: 2, hp: 5, speed: 0 }
-    category: "support"

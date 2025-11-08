@@ -1,8 +1,0 @@
-tag: "GER"
-name: "Germany"
-color: { r: 0.2, g: 0.2, b: 0.7 }
-ideology: "authoritarian"
-resources: { manpower: 5000000, civ_factories: 10, mil_factories: 8, research_slots: 3 }
-owned_provinces: [0,1,2]
-controlled_provinces: [0,1,2]
-capital: 1
