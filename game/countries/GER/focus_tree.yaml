@@ -1,0 +1,16 @@
+focuses:
+  - id: "revive_industry"
+    name: "Revive Industry"
+    days: 70
+    prerequisites: []
+    mutually_exclusive: []
+    effects:
+      - { type: "add_civ_factories", amount: 2 }
+      - { type: "add_pp", amount: 50 }
+  - id: "militarize"
+    name: "Militarize"
+    days: 35
+    prerequisites: ["revive_industry"]
+    mutually_exclusive: []
+    effects:
+      - { type: "add_mil_factories", amount: 2 }
