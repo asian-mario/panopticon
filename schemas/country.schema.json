@@ -1,0 +1,86 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Country Definition Schema",
+    "type": "object",
+    "required": ["tag", "name", "color", "ideology", "resources", "owned_provinces", "controlled_provinces", "capital"],
+    "properties": {
+        "tag": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$",
+            "description": "Three-letter country tag (e.g., 'GER', 'FRA')"
+        },
+        "name": {
+            "type": "string",
+            "description": "Full country name"
+        },
+        "color": {
+            "type": "object",
+            "required": ["r", "g", "b"],
+            "properties": {
+                "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                }
+            }
+        },
+        "ideology": {
+            "type": "string",
+            "enum": ["authoritarian", "democratic", "communist"],
+            "description": "Political ideology"
+        },
+        "resources": {
+            "type": "object",
+            "required": ["manpower", "civ_factories", "mil_factories", "research_slots"],
+            "properties": {
+                "manpower": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "civ_factories": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "mil_factories": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "research_slots": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                }
+            }
+        },
+        "owned_provinces": {
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "minimum": 0
+            }
+        },
+        "controlled_provinces": {
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "minimum": 0
+            }
+        },
+        "capital": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Province ID of the capital"
+        }
+    },
+    "additionalProperties": false
+}

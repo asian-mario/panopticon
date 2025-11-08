@@ -1,0 +1,78 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Focus Tree Schema",
+    "type": "object",
+    "required": ["focuses"],
+    "properties": {
+        "focuses": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["id", "name", "days", "prerequisites", "mutually_exclusive", "effects"],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique focus identifier"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Display name of the focus"
+                    },
+                    "days": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Number of days to complete"
+                    },
+                    "prerequisites": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of focus IDs that must be completed first"
+                    },
+                    "mutually_exclusive": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of focus IDs that cannot be taken if this one is completed"
+                    },
+                    "effects": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["type"],
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "enum": ["add_civ_factories", "add_mil_factories", "add_pp", "unlock_battalion", "unit_stat_mod"]
+                                },
+                                "amount": {
+                                    "type": "integer"
+                                },
+                                "battalion": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "attack": {
+                                    "type": "number"
+                                },
+                                "defense": {
+                                    "type": "number"
+                                },
+                                "hp": {
+                                    "type": "number"
+                                },
+                                "speed": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

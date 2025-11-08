@@ -1,0 +1,57 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Provinces Schema",
+    "type": "object",
+    "required": ["provinces"],
+    "properties": {
+        "provinces": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["id", "name", "pos", "region"],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "description": "Unique province identifier"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Display name of the province"
+                    },
+                    "pos": {
+                        "type": "object",
+                        "required": ["x", "y"],
+                        "properties": {
+                            "x": {
+                                "type": "number",
+                                "description": "X coordinate on map"
+                            },
+                            "y": {
+                                "type": "number",
+                                "description": "Y coordinate on map"
+                            }
+                        }
+                    },
+                    "region": {
+                        "type": "string",
+                        "description": "Strategic region name"
+                    },
+                    "polygon": {
+                        "type": "array",
+                        "description": "Optional polygon points for province shape",
+                        "items": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    }
+}

@@ -6,6 +6,10 @@ pub mod adjacency;
 pub mod focus;
 pub mod units;
 pub mod save;
+pub mod effects;
+pub mod simulation;
+pub mod components;
+pub mod types;
 
 pub use time::*;
 pub use data::*;
@@ -15,3 +19,7 @@ pub use adjacency::*;
 pub use focus::*;
 pub use units::*;
 pub use save::*;
+pub use effects::*;
+pub use simulation::*;
+pub use components::*;
+pub use types::*;

@@ -6,3 +6,8 @@ pub struct ProvinceDef {
     pub name: String,
     pub pos: crate::core::data::Pos,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProvincesList {
+    pub provinces: Vec<ProvinceDef>,
+}

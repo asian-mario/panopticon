@@ -1,1 +1,1 @@
-# panopticon (v0.1) modular strategy game
+# panopticon (v0.1) modular strategy gameq
