@@ -1,0 +1,10 @@
+provinces:
+  - id: 0
+    name: "Aachen"
+    pos: { x: 1200, y: 620 }
+  - id: 1
+    name: "Cologne"
+    pos: { x: 1240, y: 640 }
+  - id: 2
+    name: "Dortmund"
+    pos: { x: 1280, y: 660 }
