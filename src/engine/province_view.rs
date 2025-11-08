@@ -3,7 +3,7 @@ use bevy_prototype_lyon::prelude::*;
 use crate::core::{
     components::*,
     province::ProvinceDef,
-    data::Pos,
+    types::CountryTag,
 };
 
 const PROVINCE_RADIUS: f32 = 20.0;
@@ -22,11 +22,14 @@ pub fn spawn_province_markers(
             center: Vec2::new(pos.x as f32, pos.y as f32),
         };
 
+        let owner_tag: CountryTag = "GER".parse().unwrap();
+        let base_color = get_country_color(&owner_tag);
+
         commands.spawn(ProvinceBundle {
             marker: ProvinceMarker { id: province.id.into() },
             ownership: ProvinceOwnership {
-                owner: "GER".parse().unwrap(), // Default for testing
-                controller: "GER".parse().unwrap(),
+                owner: owner_tag,
+                controller: owner_tag,
             },
             hoverable: Hoverable { hovered: false },
             selectable: Selectable { selected: false },
@@ -38,24 +41,22 @@ pub fn spawn_province_markers(
             path: GeometryBuilder::build_as(&circle),
             ..default()
         })
-        .insert(Fill::color(Color::BLUE))
+        .insert(Fill::color(base_color))
         .insert(Stroke::new(Color::WHITE, HOVER_OUTLINE_WIDTH));
     }
 }
 
 pub fn update_province_hover(
-    mut provinces: Query<(Entity, &Transform, &mut Hoverable, &mut Stroke)>,
+    mut provinces: Query<(&Transform, &mut Hoverable, &mut Stroke)>,
     camera: Query<(&Camera, &GlobalTransform)>,
-    windows: Res<Windows>,
+    window: Query<&Window>,
 ) {
-    if let Some(window) = windows.get_single() {
+    if let Ok(window) = window.get_single() {
         if let Some(cursor_pos) = window.cursor_position() {
             let (camera, camera_transform) = camera.single();
             
-            if let Some(world_pos) = camera.viewport_to_world(camera_transform, cursor_pos) {
-                let world_pos = Vec2::new(world_pos.x, world_pos.y);
-
-                for (_, transform, mut hoverable, mut stroke) in provinces.iter_mut() {
+            if let Some(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
+                for (transform, mut hoverable, mut stroke) in provinces.iter_mut() {
                     let province_pos = transform.translation.truncate();
                     let distance = world_pos.distance(province_pos);
                     
@@ -68,28 +69,40 @@ pub fn update_province_hover(
         }
     }
 }
-    let (camera, camera_transform) = camera.single();
-    let window = windows.single();
 
-    if let Some(cursor_pos) = window.cursor_position() {
-        if let Some(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
-            for (_, transform, mut hoverable) in &mut provinces {
-                let province_pos = transform.translation.truncate();
-                let distance = province_pos.distance(world_pos);
-                hoverable.hovered = distance < PROVINCE_RADIUS;
+pub fn handle_province_selection(
+    mut provinces: Query<(&mut Selectable, &Hoverable, &mut Fill, &ProvinceOwnership)>,
+    buttons: Res<Input<MouseButton>>,
+) {
+    if buttons.just_pressed(MouseButton::Left) {
+        for (mut selectable, hoverable, mut fill, ownership) in provinces.iter_mut() {
+            if hoverable.hovered {
+                selectable.selected = !selectable.selected;
+                
+                // Set color based on owner + selection
+                let base_color = get_country_color(&ownership.owner);
+                let mut adjusted_color = base_color;
+                
+                // Lighten the color when selected
+                if selectable.selected {
+                    adjusted_color = Color::rgb(
+                        (base_color.r() + 0.2).min(1.0),
+                        (base_color.g() + 0.2).min(1.0),
+                        (base_color.b() + 0.2).min(1.0),
+                    );
+                }
+                
+                fill.color = adjusted_color;
             }
         }
     }
 }
 
-pub fn update_province_visuals(
-    mut provinces: Query<(&Hoverable, &Selectable, &mut Stroke)>,
-) {
-    for (hoverable, selectable, mut stroke) in &mut provinces {
-        stroke.color = if hoverable.hovered || selectable.selected {
-            Color::WHITE
-        } else {
-            Color::DARK_GRAY
-        };
+fn get_country_color(tag: &CountryTag) -> Color {
+    match tag.as_str().as_str() {
+        "GER" => Color::rgb(0.2, 0.2, 0.7), // German blue
+        "FRA" => Color::rgb(0.2, 0.7, 0.2), // French green
+        "POL" => Color::rgb(0.7, 0.2, 0.2), // Polish red
+        _ => Color::GRAY,
     }
 }

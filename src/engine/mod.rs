@@ -19,7 +19,9 @@ impl Plugin for EnginePlugin {
             .add_systems(Update, (
                 ui_topbar::ui_topbar_system,
                 province_view::update_province_hover,
-                province_view::update_province_visuals,
+                province_view::handle_province_selection,
+                camera::camera_movement,
+                camera::camera_zoom,
             ));
     }
 }

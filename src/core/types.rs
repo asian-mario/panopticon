@@ -18,6 +18,12 @@ pub struct DivisionId(pub u64);
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, serde::Serialize, serde::Deserialize, Component)]
 pub struct CountryTag([char; 3]);
 
+impl CountryTag {
+    pub fn as_str(&self) -> String {
+        self.0.iter().collect()
+    }
+}
+
 impl FromStr for CountryTag {
     type Err = anyhow::Error;
 
