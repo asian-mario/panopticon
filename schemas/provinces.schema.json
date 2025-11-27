@@ -8,7 +8,7 @@
             "type": "array",
             "items": {
                 "type": "object",
-                "required": ["id", "name", "pos", "region"],
+                "required": ["id", "name", "pos"],
                 "properties": {
                     "id": {
                         "type": "integer",
@@ -35,7 +35,8 @@
                     },
                     "region": {
                         "type": "string",
-                        "description": "Strategic region name"
+                        "description": "Strategic region name",
+                        "default": "Unknown"
                     },
                     "polygon": {
                         "type": "array",

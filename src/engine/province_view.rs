@@ -3,6 +3,7 @@ use bevy_prototype_lyon::prelude::*;
 use crate::core::{
     components::*,
     province::ProvinceDef,
+    country::CountryDef,
     types::CountryTag,
 };
 
@@ -10,11 +11,25 @@ const PROVINCE_RADIUS: f32 = 20.0;
 const HOVER_OUTLINE_WIDTH: f32 = 2.0;
 
 pub fn spawn_province_markers(
-    mut commands: Commands,
-    provinces: Vec<ProvinceDef>,
+    commands: &mut Commands,
+    provinces: &[ProvinceDef],
+    countries: &[CountryDef],
 ) {
-    for province in provinces {
-        let pos = province.pos;
+    for province in provinces.iter() {
+        let pos = &province.pos;
+        // Find owning country (first whose owned_provinces contains id)
+        let mut owner_tag: Option<CountryTag> = None;
+        let mut owner_color: Color = Color::GRAY;
+        for c in countries {
+            if let Some(owned) = &c.owned_provinces {
+                if owned.iter().any(|pid| *pid == province.id) {
+                    if let Ok(tag) = c.tag.parse() { owner_tag = Some(tag); }
+                    if let Some(col) = &c.color { owner_color = Color::rgb(col.r, col.g, col.b); }
+                    break;
+                }
+            }
+        }
+        let owner_tag = owner_tag.unwrap_or_else(|| "ZZZ".parse().unwrap());
         
         // Create circle shape
         let circle = shapes::Circle {
@@ -22,15 +37,11 @@ pub fn spawn_province_markers(
             center: Vec2::new(pos.x as f32, pos.y as f32),
         };
 
-        let owner_tag: CountryTag = "GER".parse().unwrap();
-        let base_color = get_country_color(&owner_tag);
+        let base_color = owner_color;
 
         commands.spawn(ProvinceBundle {
             marker: ProvinceMarker { id: province.id.into() },
-            ownership: ProvinceOwnership {
-                owner: owner_tag,
-                controller: owner_tag,
-            },
+            ownership: ProvinceOwnership { owner: owner_tag, controller: owner_tag },
             hoverable: Hoverable { hovered: false },
             selectable: Selectable { selected: false },
             spatial: SpatialBundle::from_transform(
@@ -98,11 +109,4 @@ pub fn handle_province_selection(
     }
 }
 
-fn get_country_color(tag: &CountryTag) -> Color {
-    match tag.as_str().as_str() {
-        "GER" => Color::rgb(0.2, 0.2, 0.7), // German blue
-        "FRA" => Color::rgb(0.2, 0.7, 0.2), // French green
-        "POL" => Color::rgb(0.7, 0.2, 0.2), // Polish red
-        _ => Color::GRAY,
-    }
-}
+fn get_country_color(_tag: &CountryTag) -> Color { Color::WHITE }

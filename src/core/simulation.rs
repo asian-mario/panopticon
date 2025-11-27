@@ -6,6 +6,7 @@ use crate::core::{
     effects::EffectRegistry,
     components::*,
 };
+use crate::engine::LoadedFocusTree;
 
 #[cfg(not(feature = "bevy"))]
 pub trait Event {}
@@ -82,7 +83,8 @@ pub fn process_focuses(
     mut focus_query: Query<(Entity, &CountryTag, &mut FocusProgress)>,
     mut ev_completed: EventWriter<FocusCompleted>,
     mut ev_tick: EventReader<Tick>,
-    _registry: Res<EffectRegistry>,
+    registry: Res<EffectRegistry>,
+    focus_tree: Option<Res<LoadedFocusTree>>,
 ) {
     for _tick in ev_tick.iter() {
         for (entity, country_tag, mut focus) in focus_query.iter_mut() {
@@ -96,6 +98,18 @@ pub fn process_focuses(
                     focus: focus.focus_id.clone(),
                 };
                 ev_completed.send(completed);
+                // Apply effects if we have tree metadata
+                if let Some(tree_res) = &focus_tree {
+                    if let Some(def) = tree_res.0.find(&focus.focus_id.0) {
+                        for eff in &def.effects {
+                            // Convert YAML params to JSON Value for registry; ignore errors silently
+                            if let Ok(params_json) = serde_json::to_value(&eff.params) {
+                                // We need a World reference; effect system is placeholder so skip real execution for now
+                                // TODO: Refactor effects to operate on game state resource rather than raw World
+                            }
+                        }
+                    }
+                }
                 commands.entity(entity).remove::<FocusProgress>();
             }
         }

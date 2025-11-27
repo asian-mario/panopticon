@@ -110,28 +110,7 @@ pub fn structural_validations(files: &[(PathBuf, String)]) -> Result<(), anyhow:
         }
     }
 
-    let mut province_ids = std::collections::HashSet::new();
-    if let Some(pv_s) = provinces_file {
-        match serde_yaml::from_str::<serde_json::Value>(pv_s) {
-            Ok(v) => {
-                if let Some(arr) = v.get("provinces").and_then(|p| p.as_array()) {
-                    for item in arr {
-                        if let Some(id) = item.get("id").and_then(|i| i.as_u64()) {
-                            let idu = id as u32;
-                            if !province_ids.insert(idu) {
-                                errors.push(format!("Duplicate province id {}", idu));
-                            }
-                        } else {
-                            errors.push("Province entry missing numeric id".to_string());
-                        }
-                    }
-                } else {
-                    errors.push("provinces.yaml missing 'provinces' array".to_string());
-                }
-            }
-            Err(e) => errors.push(format!("parsing provinces.yaml: {}", e)),
-        }
-    }
+    // province_ids already populated above; skip second duplicate parsing block to avoid duplicate errors
 
     if let Some(adj_s) = adjacency_file {
         match serde_yaml::from_str::<serde_json::Value>(adj_s) {
@@ -157,7 +136,7 @@ pub fn structural_validations(files: &[(PathBuf, String)]) -> Result<(), anyhow:
     }
 
     // Countries: check province references and capital validity
-    for (p, s) in files.iter().filter(|(p, _)| p.to_string_lossy().contains("country.yaml")) {
+    for (p, s) in files.iter().filter(|(p, _)| p.ends_with("country.yaml")) {
         match serde_yaml::from_str::<serde_json::Value>(s) {
             Ok(v) => {
                 if let Some(owned) = v.get("owned_provinces").and_then(|x| x.as_array()) {
@@ -191,7 +170,7 @@ pub fn structural_validations(files: &[(PathBuf, String)]) -> Result<(), anyhow:
     }
 
     // Focus trees: prereqs exist and DAG check
-    for (p, s) in files.iter().filter(|(p, _)| p.to_string_lossy().ends_with("focus_tree.yaml") || p.to_string_lossy().ends_with("focus_tree.yml")) {
+    for (p, s) in files.iter().filter(|(p, _)| p.ends_with("focus_tree.yaml") || p.ends_with("focus_tree.yml")) {
         match serde_yaml::from_str::<crate::core::focus::FocusTree>(s) {
             Ok(ft) => {
                 let ids: std::collections::HashSet<_> = ft.focuses.iter().map(|f| f.id.clone()).collect();

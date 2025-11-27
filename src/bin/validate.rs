@@ -49,8 +49,9 @@ fn main() -> Result<()> {
     }
 
     // Load and validate country definitions
+    // Only validate actual country definition files, not every file inside countries/*
     let country_files = files.iter()
-        .filter(|(p, _)| p.components().any(|c| c.as_os_str() == "countries"));
+        .filter(|(p, _)| p.ends_with("country.yaml"));
     
     for (path, contents) in country_files {
         match serde_yaml::from_str::<CountryDef>(contents) {
@@ -59,30 +60,19 @@ fn main() -> Result<()> {
         }
     }
 
-    // Print summary and exit with appropriate code
-    if errors.is_empty() {
-        println!("\n✓ All validations passed!");
-        return Ok(());
-    } else {
-        eprintln!("Validation complete with {} error(s).", errors.len());
-        for (i, e) in errors.into_iter().enumerate() {
-            eprintln!("{}. {}", i + 1, e);
-        }
-        std::process::exit(1);
-    }
-
-    // run structural validations (cross-file checks)
+    // run structural validations (cross-file checks) AFTER schemas
     match validator::structural_validations(&files) {
         Ok(()) => (),
         Err(e) => errors.push(e),
     }
 
-    // check countries
-    if let Some(cn) = files.iter().find(|(p, _)| p.ends_with("country.yaml")) {
-        match serde_yaml::from_str::<CountryDef>(&cn.1) {
-            Ok(ger) => println!("Country {} tag: {}", cn.0.display(), ger.tag),
+    // Extra country sanity (duplicate with schema but keeps future extensibility)
+    for (path, contents) in files.iter().filter(|(p, _)| p.ends_with("country.yaml")) {
+        match serde_yaml::from_str::<CountryDef>(contents) {
+            Ok(_) => (),
             Err(e) => errors.push(e.into()),
         }
+        println!("Checked country file {}", path.display());
     }
 
     if errors.is_empty() {
